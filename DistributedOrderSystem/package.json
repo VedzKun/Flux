@@ -1,0 +1,15 @@
+{
+  "name": "distributed-order-system",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "start:order": "npm run start --workspace=services/order",
+    "start:inventory": "npm run start --workspace=services/inventory",
+    "start:payment": "npm run start --workspace=services/payment",
+    "build": "npm run build --workspaces"
+  }
+}
