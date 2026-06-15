@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { createPostgresPool, RabbitMQClient } from '@dos/shared';
 import { InventoryRepository } from './repository/inventoryRepository';
 import { InventoryService } from './services/inventoryService';
@@ -6,6 +7,7 @@ import { InventoryController } from './controllers/inventoryController';
 
 async function bootstrap() {
   const app = express();
+  app.use(cors());
   app.use(express.json());
 
   const pgUrl = process.env.DATABASE_URL || 'postgres://admin:password@localhost:5432/order_system';

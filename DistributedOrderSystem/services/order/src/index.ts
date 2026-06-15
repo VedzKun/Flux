@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { createPostgresPool, RabbitMQClient } from '@dos/shared';
 import { OrderRepository } from './repository/orderRepository';
 import { OrderService } from './services/orderService';
@@ -6,6 +7,7 @@ import { OrderController } from './controllers/orderController';
 
 async function bootstrap() {
   const app = express();
+  app.use(cors());
   app.use(express.json());
 
   // Configuration (In production, use dotenv or environment variables)

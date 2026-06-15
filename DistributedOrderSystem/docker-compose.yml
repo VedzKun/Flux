@@ -100,6 +100,17 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  ui:
+    build:
+      context: services/ui
+      dockerfile: Dockerfile
+    container_name: ui-dashboard
+    ports:
+      - "3000:5173"
+    depends_on:
+      - order-service
+      - inventory-service
+
 volumes:
   postgres_data:
   redis_data:
