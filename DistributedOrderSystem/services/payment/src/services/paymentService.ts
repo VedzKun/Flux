@@ -16,7 +16,7 @@ export class PaymentService {
       'payment_inventory_reserved_queue',
       'inventory_exchange',
       'inventory.reserved',
-      async (msg) => {
+      async (msg: any) => {
         // Calculate mock amount
         const amount = 100.00; // Mock calculation based on items
         
@@ -29,11 +29,20 @@ export class PaymentService {
             orderId: msg.orderId,
             items: msg.items
           });
+          
+          await this.mq.publish('orders_exchange', 'order.completed', {
+            orderId: msg.orderId
+          });
         } else {
           await this.repo.recordTransaction(msg.orderId, amount, 'FAILED');
           await this.mq.publish('payment_exchange', 'payment.failed', {
             orderId: msg.orderId,
             items: msg.items,
+            reason: 'Card declined randomly'
+          });
+
+          await this.mq.publish('orders_exchange', 'order.failed', {
+            orderId: msg.orderId,
             reason: 'Card declined randomly'
           });
         }

@@ -1,14 +1,15 @@
-import amqp, { Connection, Channel } from 'amqplib';
+import { connect, ChannelModel, Channel } from 'amqplib';
 
 export class RabbitMQClient {
-  private connection: Connection | null = null;
+  private connection: ChannelModel | null = null;
   private channel: Channel | null = null;
 
   constructor(private readonly url: string) {}
 
   async connect() {
-    this.connection = await amqp.connect(this.url);
-    this.channel = await this.connection.createChannel();
+    const conn = await connect(this.url);
+    this.connection = conn;
+    this.channel = await conn.createChannel();
   }
 
   async publish(exchange: string, routingKey: string, message: any) {

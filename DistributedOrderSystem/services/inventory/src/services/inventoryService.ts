@@ -30,7 +30,7 @@ export class InventoryService {
       'inventory_order_created_queue',
       'orders_exchange',
       'order.created',
-      async (msg) => {
+      async (msg: any) => {
         let allReserved = true;
         const reservedItems = [];
 
@@ -53,12 +53,21 @@ export class InventoryService {
             userId: msg.userId,
             items: msg.items // Sending items forward
           });
+
+          await this.mq.publish('orders_exchange', 'order.processing', {
+            orderId: msg.orderId
+          });
         } else {
           // rollback partial reservations
           for (const item of reservedItems) {
             await this.repo.releaseStock(item.productId, item.quantity);
           }
           await this.mq.publish('inventory_exchange', 'inventory.failed', {
+            orderId: msg.orderId,
+            reason: 'Insufficient stock'
+          });
+
+          await this.mq.publish('orders_exchange', 'order.failed', {
             orderId: msg.orderId,
             reason: 'Insufficient stock'
           });
@@ -71,7 +80,7 @@ export class InventoryService {
       'inventory_payment_failed_queue',
       'payment_exchange',
       'payment.failed',
-      async (msg) => {
+      async (msg: any) => {
         for (const item of msg.items) {
           await this.repo.releaseStock(item.productId, item.quantity);
         }
@@ -84,7 +93,7 @@ export class InventoryService {
       'inventory_payment_successful_queue',
       'payment_exchange',
       'payment.successful',
-      async (msg) => {
+      async (msg: any) => {
         for (const item of msg.items) {
           await this.repo.commitStock(item.productId, item.quantity);
         }

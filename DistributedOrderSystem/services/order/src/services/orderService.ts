@@ -49,7 +49,7 @@ export class OrderService {
       'order_updates_queue',
       'orders_exchange',
       'order.processing',
-      async (msg) => {
+      async (msg: any) => {
         await this.repo.updateOrderStatus(msg.orderId, 'PROCESSING');
         await this.redisClient.del(`order:${msg.orderId}`); // Invalidate cache
       }
@@ -59,7 +59,7 @@ export class OrderService {
       'order_completed_queue',
       'orders_exchange',
       'order.completed',
-      async (msg) => {
+      async (msg: any) => {
         await this.repo.updateOrderStatus(msg.orderId, 'COMPLETED');
         await this.redisClient.del(`order:${msg.orderId}`);
       }
@@ -69,7 +69,7 @@ export class OrderService {
       'order_failed_queue',
       'orders_exchange',
       'order.failed',
-      async (msg) => {
+      async (msg: any) => {
         await this.repo.updateOrderStatus(msg.orderId, 'FAILED');
         await this.redisClient.del(`order:${msg.orderId}`);
       }
