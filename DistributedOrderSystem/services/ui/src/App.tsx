@@ -92,7 +92,13 @@ function App() {
         userId: `user_${Math.floor(Math.random() * 1000)}`,
         items: [{ productId, quantity }]
       });
-      setOrders(prev => [res.data.order, ...prev]);
+      const newOrder: Order = {
+        id: res.data.orderId,
+        status: 'pending',
+        totalAmount: 0, // This gets updated on next poll
+        items: [{ productId, quantity }]
+      };
+      setOrders(prev => [newOrder, ...prev]);
     } catch (err) {
       console.error('Failed to create order:', err);
       alert('Failed to create order. See console.');

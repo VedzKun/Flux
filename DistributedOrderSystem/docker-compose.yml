@@ -107,6 +107,9 @@ services:
     container_name: ui-dashboard
     ports:
       - "3000:5173"
+    volumes:
+      - ./services/ui:/app
+      - /app/node_modules
     depends_on:
       - order-service
       - inventory-service
