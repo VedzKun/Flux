@@ -51,6 +51,8 @@ export class OrderService {
       'order.processing',
       async (msg: any) => {
         await this.repo.updateOrderStatus(msg.orderId, 'PROCESSING');
+        await this.repo.updateSagaStep(msg.orderId, 'STOCK_RESERVATION', 'SUCCESS', 'Inventory stock reserved successfully.');
+        await this.repo.updateSagaStep(msg.orderId, 'PAYMENT_PROCESSING', 'PROCESSING', 'Executing payment transaction...');
         await this.redisClient.del(`order:${msg.orderId}`); // Invalidate cache
       }
     );
@@ -61,6 +63,8 @@ export class OrderService {
       'order.completed',
       async (msg: any) => {
         await this.repo.updateOrderStatus(msg.orderId, 'COMPLETED');
+        await this.repo.updateSagaStep(msg.orderId, 'PAYMENT_PROCESSING', 'SUCCESS', 'Payment processed successfully.');
+        await this.repo.updateSagaStep(msg.orderId, 'SAGA_COMPLETED', 'SUCCESS', 'Saga flow completed. Order fulfilled.');
         await this.redisClient.del(`order:${msg.orderId}`);
       }
     );
@@ -71,6 +75,19 @@ export class OrderService {
       'order.failed',
       async (msg: any) => {
         await this.repo.updateOrderStatus(msg.orderId, 'FAILED');
+        
+        if (msg.reason === 'Insufficient stock') {
+          await this.repo.updateSagaStep(msg.orderId, 'STOCK_RESERVATION', 'FAILED', 'Failed: Insufficient stock.');
+          await this.repo.updateSagaStep(msg.orderId, 'PAYMENT_PROCESSING', 'FAILED', 'Payment cancelled due to reservation failure.');
+          await this.repo.updateSagaStep(msg.orderId, 'SAGA_COMPLETED', 'FAILED', 'Order failed: Insufficient stock.');
+        } else if (msg.reason === 'Card declined randomly') {
+          await this.repo.updateSagaStep(msg.orderId, 'STOCK_RESERVATION', 'FAILED', 'Compensating action: stock reservation rolled back.');
+          await this.repo.updateSagaStep(msg.orderId, 'PAYMENT_PROCESSING', 'FAILED', 'Payment failed: Card declined randomly.');
+          await this.repo.updateSagaStep(msg.orderId, 'SAGA_COMPLETED', 'FAILED', 'Order failed: Payment declined.');
+        } else {
+          await this.repo.updateSagaStep(msg.orderId, 'SAGA_COMPLETED', 'FAILED', `Order failed: ${msg.reason}`);
+        }
+
         await this.redisClient.del(`order:${msg.orderId}`);
       }
     );

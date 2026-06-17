@@ -254,3 +254,115 @@ body {
   font-weight: 700;
   color: var(--accent-color);
 }
+
+/* Saga Timeline Styles */
+.list-item-container {
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 0;
+}
+
+.list-item-container:last-child {
+  border-bottom: none;
+}
+
+.list-item-container .list-item {
+  border-bottom: none;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.list-item-container .list-item:hover {
+  opacity: 0.8;
+}
+
+.saga-timeline-container {
+  margin-top: 16px;
+  padding: 24px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+}
+
+.saga-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  min-height: 80px;
+}
+
+.timeline-icon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 24px;
+  height: 100%;
+}
+
+.timeline-connector {
+  width: 2px;
+  background-color: var(--border-color);
+  flex-grow: 1;
+  margin: 4px 0;
+  min-height: 40px;
+  transition: background-color 0.5s ease;
+}
+
+.connector-success {
+  background-color: var(--success);
+}
+
+.icon-success { color: var(--success); }
+.icon-failed { color: var(--danger); }
+.icon-processing { color: var(--accent-color); }
+.icon-pending { color: var(--text-secondary); opacity: 0.5; }
+
+.timeline-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 24px;
+}
+
+.timeline-step:last-child .timeline-content {
+  padding-bottom: 0;
+}
+
+.timeline-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeline-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.timeline-message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.text-danger {
+  color: var(--danger) !important;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 2s linear infinite;
+}
