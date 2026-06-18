@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Package, Activity, ShoppingCart, PlusCircle, Server, CheckCircle2, CircleDashed, XCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Package, Activity, ShoppingCart, PlusCircle, Server, CheckCircle2, CircleDashed, XCircle, Clock, ChevronDown, ChevronUp, CreditCard, Mail } from 'lucide-react';
 import './index.css';
 
 const ORDER_API = 'http://localhost:3001';
@@ -133,27 +133,78 @@ function App() {
 
   return (
     <div className="dashboard-container">
+      {/* SVG for Gradient Icon */}
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <linearGradient id="brand-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#818cf8" />
+        </linearGradient>
+      </svg>
+
       {/* Sidebar */}
       <aside className="sidebar">
-        <div className="brand">
-          <Activity className="brand-icon" size={28} />
-          Distributed
-        </div>
-        
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-            <Server size={18} />
-            <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>SYSTEM STATUS</span>
+        <div>
+          <div className="brand">
+            <Activity className="brand-icon" size={28} />
+            Saga Flow
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 0' }}>
-            <div className="live-indicator"></div>
-            <span style={{ fontSize: '0.875rem' }}>Order Service: Live</span>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
+              <Server size={16} />
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px' }}>MICROSERVICES</span>
+            </div>
+            
+            <div className="services-list">
+              <div className="service-card">
+                <div className="service-info">
+                  <ShoppingCart className="service-icon" size={18} />
+                  <span className="service-name">Order Service</span>
+                </div>
+                <div className="service-status">
+                  <div className="live-indicator"></div>
+                  Live
+                </div>
+              </div>
+
+              <div className="service-card">
+                <div className="service-info">
+                  <Package className="service-icon" size={18} />
+                  <span className="service-name">Inventory</span>
+                </div>
+                <div className="service-status">
+                  <div className="live-indicator"></div>
+                  Live
+                </div>
+              </div>
+
+              <div className="service-card">
+                <div className="service-info">
+                  <CreditCard className="service-icon" size={18} />
+                  <span className="service-name">Payment</span>
+                </div>
+                <div className="service-status">
+                  <div className="live-indicator"></div>
+                  Live
+                </div>
+              </div>
+
+              <div className="service-card">
+                <div className="service-info">
+                  <Mail className="service-icon" size={18} />
+                  <span className="service-name">Notifications</span>
+                </div>
+                <div className="service-status">
+                  <div className="live-indicator"></div>
+                  Live
+                </div>
+              </div>
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 0' }}>
-            <div className="live-indicator"></div>
-            <span style={{ fontSize: '0.875rem' }}>Inventory Service: Live</span>
-          </div>
+        </div>
+
+        <div className="sidebar-footer">
+          Choreographed Saga Pattern Demo
         </div>
       </aside>
 
@@ -174,13 +225,28 @@ function App() {
               Live Inventory
             </h2>
             <div className="inventory-grid">
-              {inventory.map(item => (
-                <div key={item.productId} className="inventory-card">
-                  <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{item.sku}</div>
-                  <div className="stock-value">{item.stockAvailable}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>in stock</div>
-                </div>
-              ))}
+              {inventory.map(item => {
+                const maxStock = item.sku === 'ITEM-1' ? 100 : item.sku === 'ITEM-2' ? 50 : 100;
+                const percentage = Math.max(0, Math.min(100, (item.stockAvailable / maxStock) * 100));
+                
+                return (
+                  <div key={item.productId} className="inventory-card">
+                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{item.sku}</div>
+                    <div className="stock-value">{item.stockAvailable}</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-secondary)' }}>available</div>
+                    
+                    <div className="stock-bar-container">
+                      <div className="stock-bar" style={{ width: `${percentage}%` }} />
+                    </div>
+                    
+                    {item.stockReserved > 0 && (
+                      <div className="stock-reserved-badge">
+                        {item.stockReserved} reserved
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
               {inventory.length === 0 && (
                 <div style={{ color: 'var(--text-secondary)', gridColumn: '1 / -1', textAlign: 'center', padding: '20px' }}>
                   Connecting to inventory service...
