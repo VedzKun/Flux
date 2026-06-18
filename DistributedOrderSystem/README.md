@@ -8,6 +8,7 @@ A production-grade scalable backend system designed for high-throughput e-commer
   - `Order Service`: Handles HTTP ingestion and overall status tracking (`3001`).
   - `Inventory Service`: Tracks and reserves stock, using Postgres Row Locks and Redis Caching (`3002`).
   - `Payment Service`: Provides mock transactional processing (simulated cards).
+  - `Notification Service`: Listens to order status changes to trigger mock user notifications (email/SMS).
 - **Event-Driven**: Async communication ensures the system doesn't fail globally if one service is slow or down. Messages are queued dynamically in RabbitMQ.
 
 ## Quick Start (Docker)
@@ -24,6 +25,7 @@ This will initialize:
 - Order Service (Port 3001)
 - Inventory Service (Port 3002)
 - Payment Service (Worker)
+- Notification Service (Worker)
 
 ### Testing the System
 Check the inventory first:
@@ -57,6 +59,7 @@ node test-e2e.js
 >                                             | -> Mock process -> Success/Fail
 >             [RabbitMQ `payment.success` / `failed`] -> [Inventory Service] (Commit/Release)
 >                                                     -> [Order Service] (Complete/Fail)
+>             [RabbitMQ `order.completed` / `failed`] -> [Notification Service] (Mock Email/SMS Alert)
 
 **Redis**: Used in the Order Service to store heavily loaded lookup states, and inside the Inventory Service to cache total available stock for fast reads without overloading Postgres.
 
